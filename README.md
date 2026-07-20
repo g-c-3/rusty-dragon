@@ -8,6 +8,16 @@ in a single 369-line source file.
 **Version:** v0.9.9 — July 2026
 **Language:** Rust (stable, `std` only — zero external crates)
 **Source:** `Rusty Dragon.rs` (369 lines, ~14.5 KB)
+**License:** MIT
+
+## ▶ Play it
+
+**[https://g-c-3.github.io/rusty-dragon/](https://g-c-3.github.io/rusty-dragon/)**
+
+Play against Rusty Dragon directly in your browser — no install required.
+The page runs the engine's own Rust source compiled to WebAssembly via
+`wasm-bindgen` (see `wasm-engine/` and `.github/workflows/build.yml`), so
+you're playing the real engine, not a reimplementation of its rules.
 
 ---
 
@@ -178,5 +188,28 @@ echo -e "position startpos\nperft 5\nquit" | ./"Rusty Dragon"
 
 ## License
 
-No license has been specified. Treat as "all rights reserved" by the
-author, Gokul Chandar, unless you hear otherwise.
+MIT License
+
+Copyright (c) 2026 Gokul Chandar
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+THE SOFTWARE.
+
+Consider adding this same text as a standalone `LICENSE` file at the repo
+root — GitHub detects it automatically and shows an "MIT License" badge on
+the repo's main page.
