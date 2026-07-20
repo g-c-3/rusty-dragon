@@ -1,0 +1,20 @@
+{
+  "name": "rusty-dragon",
+  "type": "module",
+  "collaborators": [
+    "Gokul Chandar"
+  ],
+  "description": "Rusty Dragon — a tiny, from-scratch chess engine, compiled to WebAssembly",
+  "version": "0.9.9",
+  "license": "UNLICENSED",
+  "files": [
+    "rusty_dragon_bg.wasm",
+    "rusty_dragon.js",
+    "rusty_dragon.d.ts"
+  ],
+  "main": "rusty_dragon.js",
+  "types": "rusty_dragon.d.ts",
+  "sideEffects": [
+    "./snippets/*"
+  ]
+}
