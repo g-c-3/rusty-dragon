@@ -21,3 +21,10 @@ lto = true
 codegen-units = 1
 panic = "abort"
 strip = true
+
+# wasm-pack runs Binaryen's wasm-opt as a post-processing pass. Recent
+# rustc versions emit "bulk memory" instructions (memory.copy/memory.fill)
+# by default for wasm32-unknown-unknown, which older wasm-opt rejects
+# unless the feature is explicitly enabled here.
+[package.metadata.wasm-pack.profile.release]
+wasm-opt = ["-O", "--enable-bulk-memory"]
