@@ -143,8 +143,8 @@
     line-height:1;
   }
   .pc.white{
-    color:#0c0805;
-    -webkit-text-stroke:0.7px rgba(0,0,0,0.95);
+    color:transparent;
+    -webkit-text-stroke:1.4px rgba(15,10,6,0.95);
   }
   .pc.black{
     color:#0c0805;
@@ -358,11 +358,12 @@
 const P=1,N=2,B=3,R=4,Q=5,K=6;
 const file = s => s % 8;
 const rank = s => (s / 8) | 0;
-// Solid-filled Unicode chess glyph set (\u265A-\u265F). Unlike the
-// "outline" family (\u2654-\u2659), these glyphs are solid silhouettes
-// with no hollow/cut-out counters, so a black fill reads as fully solid
-// black with no background peeking through — matching the screenshot.
-const PIECE_GLYPH = { 1:'\u265F', 2:'\u265E', 3:'\u265D', 4:'\u265C', 5:'\u265B', 6:'\u265A' };
+// Black pieces use the solid-filled Unicode family (\u265A-\u265F) —
+// true solid silhouettes with no cut-outs, reads as complete black fill.
+// White pieces use the outline Unicode family (\u2654-\u2659) with a
+// transparent fill, giving the classic hollow/line-art look.
+const PIECE_GLYPH_BLACK = { 1:'\u265F', 2:'\u265E', 3:'\u265D', 4:'\u265C', 5:'\u265B', 6:'\u265A' };
+const PIECE_GLYPH_WHITE = { 1:'\u2659', 2:'\u2658', 3:'\u2657', 4:'\u2656', 5:'\u2655', 6:'\u2654' };
 const PIECE_LETTER = {2:'N',3:'B',4:'R',5:'Q',6:'K'};
 
 function sqFromStr(s){ return (s.charCodeAt(1)-49)*8 + (s.charCodeAt(0)-97); }
@@ -470,7 +471,7 @@ function render(){
     if(p!==0){
       const span = document.createElement('span');
       span.className = 'piece pc ' + (p>0?'white':'black');
-      span.textContent = PIECE_GLYPH[Math.abs(p)];
+      span.textContent = (p>0?PIECE_GLYPH_WHITE:PIECE_GLYPH_BLACK)[Math.abs(p)];
       el.appendChild(span);
     }
     if(selected===sq) el.classList.add('selected');
@@ -533,7 +534,7 @@ function renderCaptured(){
     bucket[pt] = (bucket[pt]||0)+1;
   }
   const order=[5,4,3,2,1];
-  const glyphSpan = (pt,white) => `<span class="cap-glyph pc ${white?'white':'black'}">${PIECE_GLYPH[pt]}</span>`;
+  const glyphSpan = (pt,white) => `<span class="cap-glyph pc ${white?'white':'black'}">${(white?PIECE_GLYPH_WHITE:PIECE_GLYPH_BLACK)[pt]}</span>`;
   let whiteMaterial=0, blackMaterial=0;
   const val={1:1,2:3,3:3,4:5,5:9};
   let capturedByWhite='', capturedByBlack='';
@@ -670,7 +671,7 @@ function openPromotionModal(){
   const white = playerColor===1;
   for(const pt of [Q,R,B,N]){
     const btn=document.createElement('button');
-    btn.innerHTML = `<span class="promo-glyph pc ${white?'white':'black'}">${PIECE_GLYPH[pt]}</span>`;
+    btn.innerHTML = `<span class="promo-glyph pc ${white?'white':'black'}">${(white?PIECE_GLYPH_WHITE:PIECE_GLYPH_BLACK)[pt]}</span>`;
     btn.addEventListener('click', ()=>{
       promoBackdrop.classList.remove('open');
       const m = { from:pendingPromotion.from, to:pendingPromotion.to, promo:pt };
