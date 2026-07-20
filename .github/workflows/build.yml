@@ -54,6 +54,13 @@ jobs:
           --out-dir ../pkg
           --out-name rusty_dragon
 
+      - name: Remove wasm-pack's generated pkg/.gitignore
+        # wasm-pack writes a pkg/.gitignore containing just "*", which
+        # silently blocks `git add` from picking up anything inside pkg/ —
+        # the build succeeds but nothing ever gets committed. Without this
+        # step the site's pkg/ folder never actually appears in the repo.
+        run: rm -f pkg/.gitignore
+
       - name: Upload pkg/ as a workflow artifact
         uses: actions/upload-artifact@v4
         with:
@@ -65,3 +72,4 @@ jobs:
         with:
           commit_message: "chore: rebuild wasm bindings [skip ci]"
           file_pattern: pkg/*
+          add_options: '-f'
