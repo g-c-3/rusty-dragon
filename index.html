@@ -519,6 +519,13 @@ function renderStatus(){
 }
 
 function renderCaptured(){
+  if(!wasmReady){
+    capWhiteEl.innerHTML = '\u2014';
+    capBlackEl.innerHTML = '\u2014';
+    diffWhiteEl.textContent = '';
+    diffBlackEl.textContent = '';
+    return;
+  }
   const startCounts = {1:8,2:2,3:2,4:2,5:1};
   const onBoardCount = {white:{},black:{}};
   for(const p of view.sq){
