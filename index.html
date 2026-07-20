@@ -426,9 +426,11 @@ function newGame(){
   if(!wasmReady) return;
   engine.reset();
   playerColor = parseInt(sideSelect.value,10);
+  flipped = (playerColor === -1);
   refreshView();
   selected = null; legalTargets = []; lastMove = null;
   gameOver = false; sanHistory = []; thinking = false;
+  buildBoardDOM();
   render();
   maybeEngineMove();
 }
