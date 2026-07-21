@@ -260,6 +260,11 @@
   }
   .promo-choices button:hover{border-color:var(--rust-bright)}
 
+  #celebration-canvas{
+    position:fixed; inset:0; width:100vw; height:100vh;
+    pointer-events:none; z-index:9999; display:none;
+  }
+
   footer{
     margin-top:40px; text-align:center; max-width:620px;
     font-size:12.5px; line-height:1.7; color:var(--ink-faint);
@@ -328,6 +333,8 @@
     </div>
   </div>
 </div>
+
+<canvas id="celebration-canvas" aria-hidden="true"></canvas>
 
 <div class="modal-backdrop" id="promo-backdrop">
   <div class="modal">
@@ -419,7 +426,7 @@ const engineNoteEl = document.getElementById('engine-note');
 let engine = null, wasmReady = false;
 let view = { sq: new Array(64).fill(0), side: 1, ep: -1 };
 let playerColor = 1, flipped = false, selected = null, legalTargets = [], lastMove = null;
-let gameOver = false, sanHistory = [], pendingPromotion = null, thinking = false;
+let gameOver = false, sanHistory = [], pendingPromotion = null, thinking = false, celebrated = false;
 
 function refreshView(){ view = parseFEN(engine.fen()); }
 function currentLegalMoves(){ const s = engine.legal_moves(); return s.length ? s.split(' ').map(parseUci) : []; }
@@ -431,7 +438,7 @@ function newGame(){
   flipped = (playerColor === -1);
   refreshView();
   selected = null; legalTargets = []; lastMove = null;
-  gameOver = false; sanHistory = []; thinking = false;
+  gameOver = false; sanHistory = []; thinking = false; celebrated = false;
   buildBoardDOM();
   render();
   maybeEngineMove();
@@ -497,6 +504,152 @@ function render(){
   renderStatus();
 }
 
+// ---------- End-of-game celebration: party poppers + fireworks ----------
+const celebrationCanvas = document.getElementById('celebration-canvas');
+const cctx = celebrationCanvas.getContext('2d');
+let celebrationRunning = false;
+
+function resizeCelebrationCanvas(){
+  celebrationCanvas.width = window.innerWidth;
+  celebrationCanvas.height = window.innerHeight;
+}
+window.addEventListener('resize', resizeCelebrationCanvas);
+
+function celebrate(){
+  if(celebrationRunning) return;
+  celebrationRunning = true;
+  resizeCelebrationCanvas();
+  celebrationCanvas.style.display = 'block';
+
+  const W = celebrationCanvas.width, H = celebrationCanvas.height;
+  const colors = ['#e07347','#b5502e','#eee0c4','#f0d9b5','#6ecbf5','#8fd694','#f5d76e'];
+
+  const confetti = [];
+  function spawnPopperBurst(originX, originY, side){
+    const baseAngle = side>0 ? -Math.PI*0.32 : -Math.PI*0.68; // up-right or up-left
+    for(let i=0;i<70;i++){
+      const a = baseAngle + (Math.random()-0.5)*0.9;
+      const speed = 6 + Math.random()*9;
+      confetti.push({
+        x: originX, y: originY,
+        vx: Math.cos(a)*speed,
+        vy: Math.sin(a)*speed,
+        size: 5+Math.random()*5,
+        color: colors[(Math.random()*colors.length)|0],
+        rot: Math.random()*Math.PI*2,
+        vrot: (Math.random()-0.5)*0.3,
+        shape: Math.random()<0.5 ? 'rect' : 'circle',
+        life: 0,
+        maxLife: 140 + Math.random()*60
+      });
+    }
+  }
+  spawnPopperBurst(W*0.08, H*0.95, 1);
+  spawnPopperBurst(W*0.92, H*0.95, -1);
+
+  const rockets = [];
+  const particles = [];
+  const maxRockets = 6;
+  let rocketsLaunched = 0;
+
+  function spawnRocket(){
+    const x = W*0.2 + Math.random()*W*0.6;
+    rockets.push({
+      x, y: H,
+      targetY: H*0.18 + Math.random()*H*0.35,
+      vy: -(9+Math.random()*3),
+      color: colors[(Math.random()*colors.length)|0]
+    });
+  }
+
+  function explode(x,y,color){
+    const count = 46;
+    for(let i=0;i<count;i++){
+      const a = (Math.PI*2*i)/count + Math.random()*0.1;
+      const speed = 2.5 + Math.random()*3.5;
+      particles.push({
+        x,y,
+        vx: Math.cos(a)*speed,
+        vy: Math.sin(a)*speed,
+        color,
+        life:0,
+        maxLife: 50+Math.random()*30,
+        size: 2+Math.random()*2
+      });
+    }
+  }
+
+  const startTime = performance.now();
+  const spawnWindow = 4200;   // ms during which new rockets may launch
+  const minRunTime = 5800;    // ms before we allow the canvas to clear
+
+  function frame(now){
+    const elapsed = now - startTime;
+    cctx.clearRect(0,0,W,H);
+
+    if(elapsed < spawnWindow && rocketsLaunched < maxRockets && Math.random() < 0.045){
+      spawnRocket();
+      rocketsLaunched++;
+    }
+
+    for(let i=confetti.length-1;i>=0;i--){
+      const c = confetti[i];
+      c.vy += 0.14;
+      c.x += c.vx; c.y += c.vy;
+      c.rot += c.vrot;
+      c.life++;
+      const alpha = Math.max(0, 1 - c.life/c.maxLife);
+      cctx.save();
+      cctx.translate(c.x,c.y);
+      cctx.rotate(c.rot);
+      cctx.globalAlpha = alpha;
+      cctx.fillStyle = c.color;
+      if(c.shape==='rect') cctx.fillRect(-c.size/2,-c.size/3,c.size,c.size*0.66);
+      else { cctx.beginPath(); cctx.arc(0,0,c.size/2,0,Math.PI*2); cctx.fill(); }
+      cctx.restore();
+      if(c.life > c.maxLife || c.y > H+50) confetti.splice(i,1);
+    }
+
+    for(let i=rockets.length-1;i>=0;i--){
+      const r = rockets[i];
+      r.y += r.vy;
+      r.vy += 0.05;
+      cctx.globalAlpha = 0.9;
+      cctx.fillStyle = r.color;
+      cctx.beginPath();
+      cctx.arc(r.x, r.y, 2.6, 0, Math.PI*2);
+      cctx.fill();
+      if(r.vy >= -1 || r.y <= r.targetY){
+        explode(r.x, r.y, r.color);
+        rockets.splice(i,1);
+      }
+    }
+
+    for(let i=particles.length-1;i>=0;i--){
+      const p = particles[i];
+      p.vy += 0.045;
+      p.x += p.vx; p.y += p.vy;
+      p.life++;
+      const alpha = Math.max(0, 1 - p.life/p.maxLife);
+      cctx.globalAlpha = alpha;
+      cctx.fillStyle = p.color;
+      cctx.beginPath();
+      cctx.arc(p.x,p.y,p.size,0,Math.PI*2);
+      cctx.fill();
+      if(p.life > p.maxLife) particles.splice(i,1);
+    }
+    cctx.globalAlpha = 1;
+
+    if(elapsed < minRunTime || confetti.length || rockets.length || particles.length){
+      requestAnimationFrame(frame);
+    } else {
+      celebrationCanvas.style.display = 'none';
+      celebrationRunning = false;
+    }
+  }
+  requestAnimationFrame(frame);
+}
+
 function renderStatus(){
   if(!wasmReady){ statusEl.className='status thinking'; statusEl.textContent='Loading engine…'; return; }
   if(thinking){ statusEl.className='status thinking'; statusEl.textContent='Rusty Dragon is thinking…'; return; }
@@ -512,10 +665,11 @@ function renderStatus(){
     } else {
       statusEl.textContent = 'Stalemate — draw';
     }
+    if(!celebrated){ celebrated=true; celebrate(); }
     return;
   }
-  if(engine.is_fifty_move_draw()){ gameOver=true; statusEl.className='status over'; statusEl.textContent='Draw — 50-move rule'; return; }
-  if(engine.is_repetition()){ gameOver=true; statusEl.className='status over'; statusEl.textContent='Draw — threefold repetition'; return; }
+  if(engine.is_fifty_move_draw()){ gameOver=true; statusEl.className='status over'; statusEl.textContent='Draw — 50-move rule'; if(!celebrated){ celebrated=true; celebrate(); } return; }
+  if(engine.is_repetition()){ gameOver=true; statusEl.className='status over'; statusEl.textContent='Draw — threefold repetition'; if(!celebrated){ celebrated=true; celebrate(); } return; }
   statusEl.textContent = engine.is_check() ? `${turn} to move — check` : `${turn} to move`;
 }
 
