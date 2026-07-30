@@ -233,6 +233,8 @@
     padding-top:14px;
   }
   .engine-note b{color:var(--ink-dim)}
+  .engine-note a{color:var(--rust-bright); text-decoration:none; border-bottom:1px dotted var(--rust-bright)}
+  .engine-note a:hover{color:var(--ink); border-bottom-color:var(--ink)}
   .engine-note code{
     font-family:'JetBrains Mono', monospace;
     font-size:11px;
@@ -330,6 +332,9 @@
       Rust source compiled to WebAssembly with <code>wasm-bindgen</code> and
       running entirely client-side in your browser. No server, no JS
       reimplementation of the rules.
+      <br><br>
+      It's a special one, too — a full chess engine
+      <a href="https://github.com/g-c-3/rusty-dragon/blob/main/Rusty%20Dragon.rs" target="_blank" rel="noopener">written in a single line of code</a>.
     </div>
   </div>
 </div>
@@ -349,6 +354,7 @@
   close collaboration with <b>Claude</b> (Anthropic), which architected the
   move generator, UCI protocol, and this browser port, and verified
   correctness with a full perft test suite.
+  <div style="margin-top:8px; font-size:11px; letter-spacing:0.03em; color:var(--ink-faint)">Created by Gokul Chandar</div>
 </footer>
 
 <script>
