@@ -2,7 +2,7 @@
 
 ### What is believed to be the world's first single-line, full-FIDE-legal, full-UCI chess engine written in Rust
 
-**Author:** Gokul Chandar, in close collaboration with **Claude** (Anthropic)
+**Author:** Gokul Chandar, in close collaboration with **AI**
 **Version:** v0.9.9 — July 2026
 **License:** MIT
 
@@ -246,7 +246,7 @@ stage, and did the work no model can do for itself: deciding what
 - Named the engine, set the license terms, and pushed explicitly for
   the record attempt documented here
 
-**Claude** (this model, across the conversation) did the implementation,
+**AI** (this model, across the conversation) did the implementation,
 verification infrastructure, and the golf work itself:
 - Designed the board representation, move generation, and search from
   scratch, and wrote the original 369-line engine
@@ -303,7 +303,7 @@ echo -e "position startpos\nperft 5\nquit" | ./rusty-dragon-record
 ## Acknowledgments
 
 Designed and engineered by **Gokul Chandar** in close collaboration with
-**Claude** (Anthropic), which architected the move generator and UCI
+**AI**, which architected the move generator and UCI
 protocol, built and ran the correctness-verification methodology
 throughout, performed the code-golf transformation documented above,
 and ported the engine to WebAssembly for the browser build.
